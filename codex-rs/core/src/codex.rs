@@ -586,6 +586,18 @@ impl Session {
             ));
         }
 
+        let forked_from = match &initial_history {
+            InitialHistory::Forked(items) => items.iter().find_map(|item| match item {
+                RolloutItem::SessionMeta(meta_line) => Some(meta_line.meta.id),
+                _ => None,
+            }),
+            InitialHistory::Resumed(items) => items.history.iter().find_map(|item| match item {
+                RolloutItem::SessionMeta(meta_line) => meta_line.meta.forked_from,
+                _ => None,
+            }),
+            InitialHistory::New => None,
+        };
+
         let (conversation_id, rollout_params) = match &initial_history {
             InitialHistory::New | InitialHistory::Forked(_) => {
                 let conversation_id = ThreadId::default();
@@ -595,6 +607,7 @@ impl Session {
                         conversation_id,
                         session_configuration.user_instructions.clone(),
                         session_source,
+                        forked_from,
                     ),
                 )
             }
@@ -731,6 +744,7 @@ impl Session {
             id: INITIAL_SUBMIT_ID.to_owned(),
             msg: EventMsg::SessionConfigured(SessionConfiguredEvent {
                 session_id: conversation_id,
+                forked_from,
                 model: session_configuration.model.clone(),
                 model_provider_id: config.model_provider_id.clone(),
                 approval_policy: session_configuration.approval_policy.value(),

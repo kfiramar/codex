@@ -58,6 +58,7 @@ pub enum RolloutRecorderParams {
         conversation_id: ThreadId,
         instructions: Option<String>,
         source: SessionSource,
+        forked_from: Option<ThreadId>,
     },
     Resume {
         path: PathBuf,
@@ -80,11 +81,13 @@ impl RolloutRecorderParams {
         conversation_id: ThreadId,
         instructions: Option<String>,
         source: SessionSource,
+        forked_from: Option<ThreadId>,
     ) -> Self {
         Self::Create {
             conversation_id,
             instructions,
             source,
+            forked_from,
         }
     }
 
@@ -152,6 +155,7 @@ impl RolloutRecorder {
                 conversation_id,
                 instructions,
                 source,
+                forked_from,
             } => {
                 let LogFileInfo {
                     file,
@@ -173,6 +177,7 @@ impl RolloutRecorder {
                     path,
                     Some(SessionMeta {
                         id: session_id,
+                        forked_from,
                         timestamp,
                         cwd: config.cwd.clone(),
                         originator: originator().value,

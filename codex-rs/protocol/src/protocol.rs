@@ -1459,6 +1459,8 @@ impl fmt::Display for SubAgentSource {
 #[derive(Serialize, Deserialize, Clone, Debug, JsonSchema, TS)]
 pub struct SessionMeta {
     pub id: ThreadId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forked_from: Option<ThreadId>,
     pub timestamp: String,
     pub cwd: PathBuf,
     pub originator: String,
@@ -1473,6 +1475,7 @@ impl Default for SessionMeta {
     fn default() -> Self {
         SessionMeta {
             id: ThreadId::default(),
+            forked_from: None,
             timestamp: String::new(),
             cwd: PathBuf::new(),
             originator: String::new(),
@@ -1986,6 +1989,8 @@ pub struct SkillsListEntry {
 pub struct SessionConfiguredEvent {
     /// Name left as session_id instead of thread_id for backwards compatibility.
     pub session_id: ThreadId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forked_from: Option<ThreadId>,
 
     /// Tell the client what model is being queried.
     pub model: String,
@@ -2361,6 +2366,7 @@ mod tests {
             id: "1234".to_string(),
             msg: EventMsg::SessionConfigured(SessionConfiguredEvent {
                 session_id: conversation_id,
+                forked_from: None,
                 model: "codex-mini-latest".to_string(),
                 model_provider_id: "openai".to_string(),
                 approval_policy: AskForApproval::Never,
