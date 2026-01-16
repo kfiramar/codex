@@ -118,6 +118,7 @@ impl RolloutRecorder {
     }
 
     /// Find the newest recorded thread path, optionally filtering to a matching cwd.
+    #[allow(clippy::too_many_arguments)]
     pub async fn find_latest_thread_path(
         codex_home: &Path,
         page_size: usize,
